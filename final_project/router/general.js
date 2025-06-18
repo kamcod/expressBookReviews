@@ -9,9 +9,15 @@ public_users.get('/getAllBooks',async function (req, res) {
   return res.status(200).json({books});
 
 });
+
 const getAllBooks = () => new Promise(async (resolve,reject) => {
   const response = await axios.get('https://mkamran4786-5000.theianext-0-labs-prod-misc-tools-us-east-0.proxy.cognitiveclass.ai/getAllBooks');
   resolve(response.data.books);
+})
+
+const getBookByISBN = (isbn) => new Promise(async (resolve,reject) => {
+  const response = await getAllBooks();
+  resolve(response[isbn]);
 })
 
 public_users.post("/register", (req,res) => {
@@ -36,9 +42,9 @@ public_users.get('/',async function (req, res) {
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn',async function (req, res) {
   const {isbn} = req.params;
-  const book = books[isbn]
+  const book = await getBookByISBN(isbn);
   if(book){
     return res.status(200).json({book: books[isbn]});
 
