@@ -4,12 +4,6 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
-
-const getAllBooks = new Promise((resolve,reject) => {
-  setTimeout(() => {
-    resolve(books)
-  },5000)})
-
 public_users.post("/register", (req,res) => {
   const { username, password } = req.body;
   if(!username || !password){
@@ -25,10 +19,15 @@ public_users.post("/register", (req,res) => {
   });
 });
 
+const getAllBooks = new Promise((resolve,reject) => {
+  setTimeout(() => {
+    resolve(books)
+  },5000)})
+
 // Get the book list available in the shop
 public_users.get('/',async function (req, res) {
   const allBooks = await getAllBooks();
-  return res.status(200).json({books: JSON.stringify(books)});
+  return res.status(200).json({books: JSON.stringify(allBooks)});
 
 });
 
