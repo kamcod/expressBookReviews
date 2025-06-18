@@ -1,8 +1,18 @@
 const express = require('express');
+const axios = require('axios');
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+
+public_users.get('/getAllBooks',async function (req, res) {
+  return res.status(200).json({books});
+
+});
+const getAllBooks = () => new Promise(async (resolve,reject) => {
+  const response = await axios.get('https://mkamran4786-5000.theianext-0-labs-prod-misc-tools-us-east-0.proxy.cognitiveclass.ai/getAllBooks');
+  resolve(response.data.books);
+})
 
 public_users.post("/register", (req,res) => {
   const { username, password } = req.body;
@@ -19,16 +29,10 @@ public_users.post("/register", (req,res) => {
   });
 });
 
-const getAllBooks = new Promise((resolve,reject) => {
-  setTimeout(() => {
-    resolve(books)
-  },5000)})
-
 // Get the book list available in the shop
 public_users.get('/',async function (req, res) {
-  const allBooks = await getAllBooks();
-  return res.status(200).json({books: JSON.stringify(allBooks)});
-
+  const response = await getAllBooks();
+  return res.status(200).json({books: JSON.stringify(response)});
 });
 
 // Get book details based on ISBN
