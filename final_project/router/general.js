@@ -35,6 +35,21 @@ const getBookByAuthor = (author) => new Promise(async (resolve,reject) => {
   }
 })
 
+const getBookByTitle = (title) => new Promise(async (resolve,reject) => {
+  const response = await getAllBooks();
+  const keys = Object.keys(response);
+  const desiredBooks = keys.filter(e => response[e].title === title);
+  let result = {};
+  desiredBooks.forEach(e => {
+    result[e] = response[e]
+  })
+  if(Object.keys(result).length){
+    resolve(result);
+  } else {
+    reject(null)
+  }
+})
+
 public_users.post("/register", (req,res) => {
   const { username, password } = req.body;
   if(!username || !password){
@@ -81,19 +96,15 @@ public_users.get('/author/:author',async function (req, res) {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async function (req, res) {
   const {title} = req.params;
-  const keys = Object.keys(books);
-  const desiredBooks = keys.filter(e => books[e].title === title);
-  let result = {};
-  desiredBooks.forEach(e => {
-    result[e] = books[e]
-  })
-  if(result){
-    return res.status(200).json({books: result});
+  try {
+    const result = await getBookByTitle(title);
+    return res.status(200).json({books: JSON.stringify(result)});
 
-  } else return res.status(500).json({message: "No book was found"});
-
+  } catch (err) {
+    return res.status(500).json({message: "No book was found"});
+  }
 });
 
 //  Get book review
